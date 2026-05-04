@@ -1,0 +1,13 @@
+{
+  "name": "railway-static-site",
+  "version": "1.0.0",
+  "description": "Sitio estático con interfaz responsive para Railway",
+  "main": "index.html",
+  "scripts": {
+    "start": "serve -s .",
+    "dev": "serve -s ."
+  },
+  "dependencies": {
+    "serve": "^14.2.1"
+  }
+}
