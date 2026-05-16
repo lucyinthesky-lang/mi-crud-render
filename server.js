@@ -11,23 +11,37 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Conexión a PostgreSQL (Render inyecta DATABASE_URL automáticamente)
+// Pool con configuración segura para Render
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false } // Requerido en Render para SSL
+  ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
 });
 
-// Crear tabla si no existe
-pool.query(`
-  CREATE TABLE IF NOT EXISTS records (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    email VARCHAR(100) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-  );
-`).catch(err => console.error('Error inicializando DB:', err));
+// Verificar conexión antes de iniciar rutas
+async function initDB() {
+  try {
+    await pool.query('SELECT NOW()');
+    console.log('✅ Conexión a PostgreSQL establecida');
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS records (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(100) NOT NULL,
+        email VARCHAR(100) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+    console.log('✅ Tabla "records" lista');
+  } catch (err) {
+    console.error('❌ ERROR CRÍTICO DE BASE DE DATOS:', err.message);
+    console.log('👉 Verifica que DATABASE_URL esté configurada correctamente en Render');
+  }
+}
 
-// 🔹 GET: Todos los registros
+initDB().then(() => {
+  app.listen(PORT, () => console.log(`🚀 Servidor escuchando en puerto ${PORT}`));
+});
+
+// Rutas CRUD
 app.get('/api/records', async (req, res) => {
   try {
     const { rows } = await pool.query('SELECT * FROM records ORDER BY id DESC');
@@ -35,7 +49,6 @@ app.get('/api/records', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// 🔹 GET: Registro individual
 app.get('/api/records/:id', async (req, res) => {
   try {
     const { rows } = await pool.query('SELECT * FROM records WHERE id = $1', [req.params.id]);
@@ -44,9 +57,9 @@ app.get('/api/records/:id', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// 🔹 POST: Agregar registro
 app.post('/api/records', async (req, res) => {
   const { name, email } = req.body;
+  if (!name || !email) return res.status(400).json({ error: 'Faltan campos' });
   try {
     const { rows } = await pool.query(
       'INSERT INTO records (name, email) VALUES ($1, $2) RETURNING *', [name, email]
@@ -55,7 +68,6 @@ app.post('/api/records', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// 🔹 PUT: Editar registro
 app.put('/api/records/:id', async (req, res) => {
   const { name, email } = req.body;
   try {
@@ -67,13 +79,10 @@ app.put('/api/records/:id', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// 🔹 DELETE: Eliminar registro
 app.delete('/api/records/:id', async (req, res) => {
   try {
     const { rowCount } = await pool.query('DELETE FROM records WHERE id = $1', [req.params.id]);
     if (rowCount === 0) return res.status(404).json({ error: 'No encontrado' });
-    res.json({ message: 'Registro eliminado' });
+    res.json({ message: 'Eliminado' });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
-
-app.listen(PORT, () => console.log(`✅ Servidor corriendo en puerto ${PORT}`));
