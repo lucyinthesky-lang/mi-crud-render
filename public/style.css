@@ -1,0 +1,27 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: system-ui, sans-serif;
+    background: linear-gradient(rgba(15,23,42,0.88), rgba(15,23,42,0.92)), url('fondo.jpg');
+    background-size: cover; background-position: center; background-attachment: fixed;
+    min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px;
+}
+.site-container { background: #fff; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); width: 100%; max-width: 900px; overflow: hidden; display: flex; flex-direction: column; min-height: 85vh; }
+.header { background: #0f172a; color: #f8fafc; padding: 20px; display: flex; align-items: center; gap: 16px; }
+.logo { width: 56px; height: 56px; object-fit: contain; background: #fff; padding: 6px; border-radius: 8px; }
+.content { flex: 1; padding: 40px 24px; text-align: center; }
+.stream-link { display: inline-block; padding: 12px 24px; background: #e11d48; color: #fff; text-decoration: none; border-radius: 8px; margin-bottom: 24px; }
+.crud-panel { max-width: 800px; margin: 0 auto; }
+table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+th { background: #f1f5f9; font-weight: 600; }
+.btn { padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+.primary { background: #0ea5e9; color: #fff; } .secondary { background: #64748b; color: #fff; }
+.btn:hover { opacity: 0.9; }
+.action-btn { margin: 0 4px; padding: 6px 10px; font-size: 0.85rem; }
+.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 100; }
+.hidden { display: none; }
+.modal-content { background: #fff; padding: 24px; border-radius: 10px; width: 90%; max-width: 400px; text-align: left; }
+.modal-content input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #cbd5e1; border-radius: 6px; }
+.modal-actions { display: flex; gap: 10px; margin-top: 12px; justify-content: flex-end; }
+.footer { background: #0f172a; color: #cbd5e1; padding: 20px; text-align: center; font-size: 0.9rem; line-height: 1.8; }
+.footer a { color: #38bdf8; text-decoration: none; }
